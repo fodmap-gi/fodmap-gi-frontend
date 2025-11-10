@@ -1,1 +1,137 @@
 @import "tailwindcss";
+
+/* Define CSS variables directly */
+:root {
+  /* Light theme */
+  --background: 0 0% 98%;
+  --foreground: 144 25% 25%;
+  --card: 0 0% 100%;
+  --card-foreground: 144 25% 25%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 144 25% 25%;
+  --primary: 144 38% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 144 35% 34%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 210 30% 90%;
+  --muted-foreground: 144 15% 45%;
+  --accent: 210 35% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 82%;
+  --destructive-foreground: 0 50% 30%;
+  --border: 210 25% 88%;
+  --input: 210 25% 88%;
+  --ring: 144 38% 52%;
+
+  /* Custom colors */
+  --primary-green: 144 38% 52%;
+  --secondary-green: 144 35% 34%;
+  --primary-blue: 210 35% 60%;
+  --secondary-blue: 210 30% 85%;
+  --primary-pink: 0 70% 82%;
+  --secondary-pink: 0 100% 91%;
+
+  --radius: 1rem;
+}
+
+.dark {
+  /* Dark theme */
+  --background: 144 25% 12%;
+  --foreground: 0 0% 95%;
+  --card: 144 20% 15%;
+  --card-foreground: 0 0% 95%;
+  --popover: 144 20% 15%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 144 38% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 144 35% 25%;
+  --secondary-foreground: 0 0% 95%;
+  --muted: 144 15% 20%;
+  --muted-foreground: 144 10% 65%;
+  --accent: 210 35% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 70% 82%;
+  --destructive-foreground: 0 50% 30%;
+  --border: 144 15% 25%;
+  --input: 144 15% 25%;
+  --ring: 144 38% 52%;
+}
+
+/* Create ALL the utility classes you need */
+@layer utilities {
+  /* Background colors */
+  .bg-background { background-color: hsl(var(--background)); }
+  .bg-foreground { background-color: hsl(var(--foreground)); }
+  .bg-card { background-color: hsl(var(--card)); }
+  .bg-primary { background-color: hsl(var(--primary)); }
+  .bg-secondary { background-color: hsl(var(--secondary)); }
+  .bg-muted { background-color: hsl(var(--muted)); }
+  .bg-accent { background-color: hsl(var(--accent)); }
+  .bg-destructive { background-color: hsl(var(--destructive)); }
+  .bg-secondary-blue { background-color: hsl(var(--secondary-blue)); }
+  .bg-primary-pink { background-color: hsl(var(--primary-pink)); }
+  
+  /* Text colors */
+  .text-foreground { color: hsl(var(--foreground)); }
+  .text-card-foreground { color: hsl(var(--card-foreground)); }
+  .text-primary { color: hsl(var(--primary)); }
+  .text-primary-foreground { color: hsl(var(--primary-foreground)); }
+  .text-secondary { color: hsl(var(--secondary)); }
+  .text-secondary-foreground { color: hsl(var(--secondary-foreground)); }
+  .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+  .text-accent { color: hsl(var(--accent)); }
+  .text-accent-foreground { color: hsl(var(--accent-foreground)); }
+  .text-destructive { color: hsl(var(--destructive)); }
+  .text-destructive-foreground { color: hsl(var(--destructive-foreground)); }
+  
+  /* Border colors */
+  .border-border { border-color: hsl(var(--border)); }
+  .border-primary { border-color: hsl(var(--primary)); }
+  .border-destructive { border-color: hsl(var(--destructive)); }
+  .border-input { border-color: hsl(var(--input)); }
+
+  /* Opacity utilities for gradients and hover states - FIXED */
+  .bg-primary-10 { background-color: hsl(var(--primary) / 0.1); }
+  .bg-accent-10 { background-color: hsl(var(--accent) / 0.1); }
+  .bg-destructive-10 { background-color: hsl(var(--destructive) / 0.1); }
+  .bg-destructive-20 { background-color: hsl(var(--destructive) / 0.2); }
+  .bg-primary-pink-20 { background-color: hsl(var(--primary-pink) / 0.2); }
+  
+  .border-primary-20 { border-color: hsl(var(--primary) / 0.2); }
+  .border-destructive-20 { border-color: hsl(var(--destructive) / 0.2); }
+
+  /* Gradient via colors */
+  .via-secondary-blue { --tw-gradient-via: hsl(var(--secondary-blue)); }
+  .via-secondary-blue-20 { --tw-gradient-via: hsl(var(--secondary-blue) / 0.2); }
+}
+
+/* Base styles */
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out;
+}

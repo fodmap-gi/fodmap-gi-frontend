@@ -1,90 +1,265 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Search, AlertCircle, Info, XCircle, Plus, Trash2 } from "lucide-react";
 
-interface AnalysisResult {
+interface FoodAnalysis {
+  id: string;
   menu: string;
   ingredients: string[];
   symptoms: string[];
-  avoid: string[];
+  shouldAvoid: string[];
 }
 
+// Toggle mock data for UI testing
+const USE_MOCK = true;
+
+const mockAnalysisData: Record<string, Omit<FoodAnalysis, "id">> = {
+  "ข้าวผัด": {
+    menu: "ข้าวผัด",
+    ingredients: ["ข้าว", "น้ำมัน", "ไข่", "ผัก", "ซอสปรุงรส", "กระเทียม"],
+    symptoms: ["ท้องอืด", "แน่นท้อง", "น้ำหนักเพิ่ม"],
+    shouldAvoid: ["น้ำมัน", "กระเทียม"],
+  },
+  "ต้มยำกุ้ง": {
+    menu: "ต้มยำกุ้ง",
+    ingredients: ["กุ้ง", "ข่า", "ตะไคร้", "พริก", "น้ำปลา", "มะนาว"],
+    symptoms: ["กรดไหลย้อน", "แสบท้อง", "ปวดท้อง"],
+    shouldAvoid: [],
+  },
+  "ส้มตำ": {
+    menu: "ส้มตำ",
+    ingredients: ["มะละกอ", "พริก", "กระเทียม", "มะนาว", "น้ำปลา", "น้ำตาล"],
+    symptoms: ["ปวดท้อง", "ท้องเสีย", "แสบคอ"],
+    shouldAvoid: ["กระเทียม", "น้ำตาล"],
+  },
+};
+
 const Index = () => {
-  const [foodMenu, setFoodMenu] = useState(""); // Input state
-  const [result, setResult] = useState<AnalysisResult | null>(null); // Result state
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [foodInputs, setFoodInputs] = useState<string[]>([""]);
+  const [analyses, setAnalyses] = useState<FoodAnalysis[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Function to simulate API call
-  const handleAnalyze = async() => {
-    if (!foodMenu.trim()) return; // Ignore empty input
+  const addInput = () => setFoodInputs([...foodInputs, ""]);
+  const removeInput = (index: number) => {
+    if (foodInputs.length > 1) {
+      setFoodInputs(foodInputs.filter((_, i) => i !== index));
+    }
+  };
+  const updateInput = (index: number, value: string) => {
+    const newInputs = [...foodInputs];
+    newInputs[index] = value;
+    setFoodInputs(newInputs);
+  };
 
-    setIsLoading(true); // Show loading
+  const handleAnalyze = async () => {
+    const validInputs = foodInputs.filter((input) => input.trim());
+    if (!validInputs.length) return;
+
+    setIsAnalyzing(true);
 
     try {
-      const response = await fetch(encodeURI('https://fodmaps.wtfywmtfk.com/dish/' + foodMenu))
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setResult(data);
+      let results: FoodAnalysis[] = [];
+
+      if (USE_MOCK) {
+        // Generate mock analysis
+        results = validInputs.map((menu, index) => {
+          const baseAnalysis = mockAnalysisData[menu] || {
+            menu,
+            ingredients: ["ส่วนประกอบหลัก", "เครื่องปรุง", "วัตถุดิบ"],
+            symptoms: ["ท้องอืด", "ปวดท้อง"],
+            shouldAvoid: ["shouldAvoid1"],
+          };
+          //setFoodInputs([""]);
+          return { ...baseAnalysis, id: `mock-${Date.now()}-${index}` };
+        });
+      } else {
+        // Call real API
+        results = await Promise.all(
+          validInputs.map(async (menu, index) => {
+            const response = await fetch(
+              encodeURI(`https://fodmaps.wtfywmtfk.com/dish/${menu}`)
+            );
+            if (!response.ok) throw new Error("Failed to fetch data");
+            const data = await response.json();
+
+            return {
+              id: `api-${Date.now()}-${index}`,
+              menu: data.menu,
+              ingredients: data.ingredients,
+              symptoms: data.symptoms,
+              shouldAvoid: data.avoid,
+            };
+          })
+        );
       }
-    } catch {
-      throw new Error("Failed to fetch data");
+
+      setAnalyses(results);
+    } catch (error) {
+      console.error("Error analyzing food:", error);
+      alert("เกิดข้อผิดพลาดในการตรวจสอบ");
     } finally {
-      setIsLoading(false);
+      setIsAnalyzing(false);
+      //setFoodInputs([""]);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === "Enter") {
+      if (index === foodInputs.length - 1 && foodInputs[index].trim()) handleAnalyze();
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      {/* Color Test Section */}
+      <div className="p-4 space-y-2 mb-6 border rounded-lg">
+        <div className="text-sm font-bold mb-2">Color Test:</div>
+        <div className="flex flex-wrap gap-2">
+          <div className="bg-primary text-primary-foreground p-2 rounded">Primary</div>
+          <div className="bg-accent text-accent-foreground p-2 rounded">Accent</div>
+          <div className="bg-destructive text-destructive-foreground p-2 rounded">Destructive</div>
+          <div className="bg-secondary text-secondary-foreground p-2 rounded">Secondary</div>
+          <div className="bg-muted text-muted-foreground p-2 rounded">Muted</div>
+        </div>
+      </div>
+
+      <div className="container max-w-md mx-auto px-4 py-8">
         {/* Header */}
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800">ตรวจสอบอาหาร</h1>
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="inline-block p-4 bg-primary rounded-3xl mb-4 shadow-lg">
+            <Search className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">ตรวจสอบอาหาร</h1>
+          <p className="text-muted-foreground">ตรวจสอบอาหารและ FODMAP</p>
         </div>
 
-        {/* Input Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>ใส่ชื่อเมนูอาหาร</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Input
-                id="food-input"
-                placeholder="เช่น ข้าวผัดกุ้ง"
-                value={foodMenu}
-                onChange={(e) => setFoodMenu(e.target.value)}
-              />
-            </div>
-            <Button onClick={handleAnalyze} disabled={!foodMenu.trim() || isLoading} className="w-full">
-              {isLoading ? "กำลังตรวจสอบ" : "ตรวจสอบ"}
+        {/* Input Section */}
+        <Card className="mb-6 shadow-lg border-0 animate-slide-up">
+          <CardContent className="pt-6 space-y-4">
+            {foodInputs.map((input, index) => (
+              <div key={index} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type="text"
+                    placeholder="ระบุชื่อเมนูอาหาร เช่น ข้าวผัด, ต้มยำกุ้ง"
+                    value={input}
+                    onChange={(e) => updateInput(index, e.target.value)}
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    className="pr-12 h-12 text-base border-primary-20 focus:border-primary"
+                  />
+                  <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                </div>
+                {foodInputs.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeInput(index)}
+                    className="h-12 w-12 border-destructive-20 hover:bg-destructive-10 hover:text-destructive"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </Button>
+                )}
+              </div>
+            ))}
+
+            <Button
+              variant="outline"
+              onClick={addInput}
+              className="w-full h-10 text-sm border-primary-20 hover:bg-primary-10 hover:text-primary"
+            >
+              <Plus className="w-4 h-4 mr-2" /> เพิ่มเมนูอีก
+            </Button>
+
+            <Button
+              onClick={handleAnalyze}
+              disabled={!foodInputs.some((input) => input.trim()) || isAnalyzing}
+              className="w-full h-10 text-sm border-primary-20 hover:bg-primary-10 hover:text-primary"
+            >
+              {isAnalyzing ? "กำลังตรวจสอบ" : "ตรวจสอบเมนู"}
             </Button>
           </CardContent>
         </Card>
 
-        {/* Result */}
-        {result && (
-          <Card>
-            <CardHeader>
-              <CardTitle>ผลการตรวจสอบ</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <strong>เมนู:</strong> {result.menu}
-              </div>
-              <div>
-                <strong>ส่วนประกอบ:</strong> {result.ingredients.join(", ")}
-              </div>
-              <div>
-                <strong>อาการที่อาจเกิด:</strong> {result.symptoms.join(", ")}
-              </div>
-              <div>
-                <strong>ส่วนประกอบที่ควรหลีกเลี่ยง:</strong> {result.avoid.join(", ")}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Results Section */}
+        {analyses.length > 0 && (
+          <div className="space-y-4 animate-fade-in">
+            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <div className="w-1 h-6 bg-linear-to-b from-primary to-accent rounded-full" /> ผลการตรวจสอบ
+            </h2>
+
+            {analyses.map((analysis) => (
+              <Card key={analysis.id} className="shadow-md border-0 overflow-hidden">
+                <div className="h-2 bg-linear-to-r from-primary via-accent to-secondary-blue" />
+                <CardContent className="pt-6 space-y-6">
+                  {/* Menu */}
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-primary-10 shrink-0">
+                      <Info className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-1">เมนู</h3>
+                      <p className="text-lg text-primary font-medium">{analysis.menu}</p>
+                    </div>
+                  </div>
+
+                  {/* Ingredients */}
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-accent-10 shrink-0">
+                      <Info className="w-5 h-5 text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-3">ส่วนประกอบ</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {analysis.ingredients.map((ingredient, idx) => (
+                          <span key={idx} className="px-3 py-1.5 bg-secondary-blue text-accent text-sm rounded-full">
+                            {ingredient}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Symptoms */}
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-primary-pink-20 shrink-0">
+                      <AlertCircle className="w-5 h-5 text-destructive-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-3">อาการที่อาจเกิด</h3>
+                      <ul className="space-y-2">
+                        {analysis.symptoms.map((symptom, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-foreground">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary-pink" />
+                            {symptom}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Should Avoid */}
+                  <div className="flex items-start gap-3 pt-4 border-t border-border">
+                    <div className="p-2 rounded-xl bg-destructive-20 shrink-0">
+                      <XCircle className="w-5 h-5 text-destructive-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground mb-3">ส่วนประกอบที่ควรหลีกเลี่ยง</h3>
+                      <ul className="space-y-2">
+                        {analysis.shouldAvoid.map((avoid, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-foreground">
+                            <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                            {avoid}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </div>
