@@ -70,6 +70,7 @@
   .bg-destructive { background-color: hsl(var(--destructive)); }
   .bg-secondary-blue { background-color: hsl(var(--secondary-blue)); }
   .bg-primary-pink { background-color: hsl(var(--primary-pink)); }
+  .bg-primary-blue { background-color: hsl(var(--primary-blue)); }
   
   /* Text colors */
   .text-foreground { color: hsl(var(--foreground)); }

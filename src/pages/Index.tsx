@@ -213,7 +213,7 @@ const Index = () => {
                       <h3 className="font-semibold text-foreground mb-3">ส่วนประกอบ</h3>
                       <div className="flex flex-wrap gap-2">
                         {analysis.ingredients.map((ingredient, idx) => (
-                          <span key={idx} className="px-3 py-1.5 bg-secondary-blue text-accent text-sm rounded-full">
+                          <span key={idx} className="px-3 py-1.5 bg-secondary-blue text-secondary-blue-foreground text-sm rounded-full">
                             {ingredient}
                           </span>
                         ))}
@@ -246,14 +246,13 @@ const Index = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground mb-3">ส่วนประกอบที่ควรหลีกเลี่ยง</h3>
-                      <ul className="space-y-2">
+                      <div className="flex flex-wrap gap-2">
                         {analysis.shouldAvoid.map((avoid, idx) => (
-                          <li key={idx} className="flex items-center gap-2 text-foreground">
-                            <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                          <span key={idx} className="px-3 py-1.5 bg-primary-pink text-primary-pink-foreground text-sm rounded-full">
                             {avoid}
-                          </li>
+                          </span>
                         ))}
-                      </ul>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
