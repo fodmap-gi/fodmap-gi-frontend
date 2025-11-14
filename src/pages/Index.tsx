@@ -5,36 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Search, AlertCircle, Info, XCircle, Plus, Trash2 } from "lucide-react";
 
 interface FoodAnalysis {
-  id: string;
   menu: string;
   ingredients: string[];
   symptoms: string[];
-  shouldAvoid: string[];
+  avoid: string[];
 }
-
-// Toggle mock data for UI testing
-const USE_MOCK = true;
-
-const mockAnalysisData: Record<string, Omit<FoodAnalysis, "id">> = {
-  "ข้าวผัด": {
-    menu: "ข้าวผัด",
-    ingredients: ["ข้าว", "น้ำมัน", "ไข่", "ผัก", "ซอสปรุงรส", "กระเทียม"],
-    symptoms: ["ท้องอืด", "แน่นท้อง", "น้ำหนักเพิ่ม"],
-    shouldAvoid: ["น้ำมัน", "กระเทียม"],
-  },
-  "ต้มยำกุ้ง": {
-    menu: "ต้มยำกุ้ง",
-    ingredients: ["กุ้ง", "ข่า", "ตะไคร้", "พริก", "น้ำปลา", "มะนาว"],
-    symptoms: ["กรดไหลย้อน", "แสบท้อง", "ปวดท้อง"],
-    shouldAvoid: [],
-  },
-  "ส้มตำ": {
-    menu: "ส้มตำ",
-    ingredients: ["มะละกอ", "พริก", "กระเทียม", "มะนาว", "น้ำปลา", "น้ำตาล"],
-    symptoms: ["ปวดท้อง", "ท้องเสีย", "แสบคอ"],
-    shouldAvoid: ["กระเทียม", "น้ำตาล"],
-  },
-};
 
 const Index = () => {
   const [foodInputs, setFoodInputs] = useState<string[]>([""]);
@@ -61,40 +36,21 @@ const Index = () => {
 
     try {
       let results: FoodAnalysis[] = [];
-
-      if (USE_MOCK) {
-        // Generate mock analysis
-        results = validInputs.map((menu, index) => {
-          const baseAnalysis = mockAnalysisData[menu] || {
-            menu,
-            ingredients: ["ส่วนประกอบหลัก", "เครื่องปรุง", "วัตถุดิบ"],
-            symptoms: ["ท้องอืด", "ปวดท้อง"],
-            shouldAvoid: ["shouldAvoid1"],
-          };
-          //setFoodInputs([""]);
-          return { ...baseAnalysis, id: `mock-${Date.now()}-${index}` };
-        });
-      } else {
-        // Call real API
-        results = await Promise.all(
-          validInputs.map(async (menu, index) => {
-            const response = await fetch(
-              encodeURI(`https://fodmaps.wtfywmtfk.com/dish/${menu}`)
-            );
-            if (!response.ok) throw new Error("Failed to fetch data");
-            const data = await response.json();
-
-            return {
-              id: `api-${Date.now()}-${index}`,
-              menu: data.menu,
-              ingredients: data.ingredients,
-              symptoms: data.symptoms,
-              shouldAvoid: data.avoid,
-            };
-          })
-        );
+      const response = await fetch(encodeURI('https://fodmaps.wtfywmtfk.com/dishes'),{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "dishes": foodInputs
+        })
+      })
+      if(response.ok){
+        results = await response.json()
       }
-
+      if(results.length === 0){
+        alert('dish not found.')
+      }
       setAnalyses(results);
     } catch (error) {
       console.error("Error analyzing food:", error);
@@ -189,8 +145,8 @@ const Index = () => {
               <div className="w-1 h-6 bg-linear-to-b from-primary to-accent rounded-full" /> ผลการตรวจสอบ
             </h2>
 
-            {analyses.map((analysis) => (
-              <Card key={analysis.id} className="shadow-md border-0 overflow-hidden">
+            {analyses.map((analysis,idx) => (
+              <Card key={idx} className="shadow-md border-0 overflow-hidden">
                 <div className="h-2 bg-linear-to-r from-primary via-accent to-secondary-blue" />
                 <CardContent className="pt-6 space-y-6">
                   {/* Menu */}
@@ -247,7 +203,7 @@ const Index = () => {
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground mb-3">ส่วนประกอบที่ควรหลีกเลี่ยง</h3>
                       <div className="flex flex-wrap gap-2">
-                        {analysis.shouldAvoid.map((avoid, idx) => (
+                        {analysis.avoid.map((avoid, idx) => (
                           <span key={idx} className="px-3 py-1.5 bg-primary-pink text-primary-pink-foreground text-sm rounded-full">
                             {avoid}
                           </span>
