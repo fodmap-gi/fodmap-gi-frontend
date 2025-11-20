@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Utensils } from "lucide-react";
-import { Search, AlertCircle, Info, XCircle, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 
@@ -25,7 +25,7 @@ const CollectionMode = () => {
     setFoodInputs(newInputs);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       addInput();
     }
@@ -145,7 +145,7 @@ const CollectionMode = () => {
                           placeholder="ระบุชื่อเมนูอาหาร เช่น ข้าวผัด, ต้มยำกุ้ง"
                           value={input}
                           onChange={(e) => updateInput(index, e.target.value)}
-                          onKeyPress={(e) => handleKeyPress(e, index)}
+                          onKeyPress={(e) => handleKeyPress(e)}
                           className={`pr-12 h-12 text-base border focus:border-primary 
                             ${touchedSave && errors.menus && input.trim() === "" ? "bg-red-100 border-red-400" : "border-primary-20 bg-white"}`}
                         />
