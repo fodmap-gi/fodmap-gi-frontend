@@ -1,11 +1,17 @@
-import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Utensils } from "lucide-react";
 import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 
+declare global {
+  interface Window {
+    liff: any;
+  }
+}
 
 const CollectionMode = () => {
   const [foodInputs, setFoodInputs] = useState<string[]>([""]); 
@@ -30,6 +36,21 @@ const CollectionMode = () => {
       addInput();
     }
   };
+
+  const initLiff = async () => {
+  const liff = window.liff;
+  await liff.init({ liffId: "2008446494" }); 
+  const token = await liff.getIDToken();   
+  return token;
+};
+
+useEffect(() => {
+  initLiff().then((t) => {
+    if (t) setToken(t);
+  });
+}, []);
+
+const [token, setToken] = useState("");
 
   const [meal, setMeal] = useState("");
   const [bloat, setBloat] = useState<"yes" | "no" | "">("");
@@ -61,41 +82,81 @@ const CollectionMode = () => {
   painLvl: false,   
 });
 
-  const saveData = () => {
-  setTouchedSave(true); // mark that the user tried saving
+  const saveData = async () => {
+  setTouchedSave(true);
 
   const hasEmptyMenu = foodInputs.some((f) => f.trim() === "");
 
   const newErrors = {
     menus: hasEmptyMenu,
     meal: !meal,
-    bloatSelect: !bloat, 
+    bloatSelect: !bloat,
     bloatLvl: bloat === "yes" && bloatLvl === 0,
-    painSelect: !pain,                           
-    painLvl: pain === "yes" && painLvl === 0,  
+    painSelect: !pain,
+    painLvl: pain === "yes" && painLvl === 0,
   };
 
   setErrors(newErrors);
 
-  // Show alert if any field has an error
   if (Object.values(newErrors).some((v) => v)) {
     alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
     return;
   }
 
-  const timestamp = new Date(time).getTime();
+  // CREATE JSON PAYLOAD
+  const payload = {
+  token: token,  
+  menus: foodInputs,
+  meal: meal,
+  bloat: bloat === "yes",
+  bloatLvl: bloatLvl,
+  pain: pain === "yes",
+  painLvl: painLvl,
+  time: new Date(time).getTime(),
+};
 
-  console.log({
-    menus: foodInputs,
-    meal,
-    bloat,
-    bloatLvl,
-    pain,
-    painLvl,
-    time: timestamp,
-  });
+  try {
+    // SEND TO BACKEND
+    const response = await fetch("http://localhost:8000/collect", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
 
-  alert("บันทึกสำเร็จ");
+    if (!response.ok) {
+      throw new Error("Failed to send data");
+    }
+
+    const result = await response.json();
+    console.log("Backend response:", result);
+
+    // SUCCESS POPUP
+    alert("เก็บข้อมูลเรียบร้อยแล้ว");
+
+    // RESET FORM
+    setFoodInputs([""]);
+    setMeal("");
+    setBloat("");
+    setBloatLvl(0);
+    setPain("");
+    setPainLvl(0);
+    setTime(getNowDateTimeLocal());
+    setTouchedSave(false);
+
+    setErrors({
+      menus: false,
+      meal: false,
+      bloatSelect: false,
+      bloatLvl: false,
+      painSelect: false,
+      painLvl: false,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    alert("บันทึกข้อมูลไม่สำเร็จ");
+  }
 };
 
 
