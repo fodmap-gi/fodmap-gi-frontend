@@ -37,26 +37,26 @@ const CollectionMode = () => {
     }
   };
 
-const initLiff = async () => {
-  const liff = window.liff;
-  await liff.init({ liffId: "2008446494" });
+  const initLiff = async () => {
+    const liff = window.liff;
+    await liff.init({ liffId: "2008446494" });
 
-  if (!liff.isLoggedIn()) {
-    liff.login();
-    return;
-  }
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
 
-  const token = liff.getIDToken(); 
-  return token;
-};
+    const token = liff.getIDToken(); 
+    return token;
+  };
 
-useEffect(() => {
-  initLiff().then((t) => {
-    if (t) setToken(t);
-  });
-}, []);
+  useEffect(() => {
+    initLiff().then((t) => {
+      if (t) setToken(t);
+    });
+  }, []);
 
-const [token, setToken] = useState("");
+  const [token, setToken] = useState("");
 
   const [meal, setMeal] = useState("");
   const [bloat, setBloat] = useState<"yes" | "no" | "">("");
