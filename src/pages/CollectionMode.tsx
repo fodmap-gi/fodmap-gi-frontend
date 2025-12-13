@@ -37,10 +37,16 @@ const CollectionMode = () => {
     }
   };
 
-  const initLiff = async () => {
+const initLiff = async () => {
   const liff = window.liff;
-  await liff.init({ liffId: "2008446494" }); 
-  const token = await liff.getIDToken();   
+  await liff.init({ liffId: "2008446494" });
+
+  if (!liff.isLoggedIn()) {
+    liff.login();
+    return;
+  }
+
+  const token = liff.getIDToken(); 
   return token;
 };
 
