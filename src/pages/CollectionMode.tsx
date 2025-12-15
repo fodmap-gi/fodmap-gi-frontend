@@ -13,6 +13,27 @@ declare global {
   }
 }
 
+const OpenInLine = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        กรุณาเปิดผ่าน LINE
+      </h1>
+
+      <p className="mb-6 text-muted-foreground">
+        หน้านี้ต้องใช้งานผ่านแอป LINE เท่านั้น
+      </p>
+
+      <a
+        href="https://line.me/R/app/2008446494"
+        className="px-6 py-3 bg-green-600 text-white rounded-lg"
+      >
+        เปิดผ่าน LINE
+      </a>
+    </div>
+  );
+};
+
 const CollectionMode = () => {
   const [foodInputs, setFoodInputs] = useState<string[]>([""]); 
 
