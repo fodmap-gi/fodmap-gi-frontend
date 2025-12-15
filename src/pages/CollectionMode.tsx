@@ -123,7 +123,7 @@ const CollectionMode = () => {
 
   try {
     // SEND TO BACKEND
-    const response = await fetch("http://localhost:8000/collect", {
+    const response = await fetch("http://fodmaps.wtfywmtfk.com/collection", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
