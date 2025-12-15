@@ -37,17 +37,26 @@ const CollectionMode = () => {
     }
   };
 
+  const [isLine, setIsLine] = useState<boolean | null>(null);
   const initLiff = async () => {
+    if (!window.liff) {
+      setIsLine(false);
+      return null;
+    }
+  
+    setIsLine(true);
+  
     const liff = window.liff;
     await liff.init({ liffId: "2008446494" });
-
+  
     if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
+      liff.login({
+        redirectUri: window.location.href,
+      });
+      return null;
     }
-
-    const token = liff.getIDToken(); 
-    return token;
+  
+    return liff.getIDToken();
   };
 
   useEffect(() => {
@@ -165,7 +174,13 @@ const CollectionMode = () => {
   }
 };
 
-
+  if (isLine === null) {
+  return null;
+  }
+  
+  if (isLine === false) {
+    return <OpenInLine />;
+  }
   return (
     
     <div className="min-h-screen bg-background">
