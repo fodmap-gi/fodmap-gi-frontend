@@ -6,33 +6,7 @@ import { Calendar, Utensils } from "lucide-react";
 import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-
-declare global {
-  interface Window {
-    liff: any;
-  }
-}
-
-const OpenInLine = () => {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center text-center p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        กรุณาเปิดผ่าน LINE
-      </h1>
-
-      <p className="mb-6 text-muted-foreground">
-        หน้านี้ต้องใช้งานผ่านแอป LINE เท่านั้น
-      </p>
-
-      <a
-        href="https://line.me/R/app/2008446494"
-        className="px-6 py-3 bg-green-600 text-white rounded-lg"
-      >
-        เปิดผ่าน LINE
-      </a>
-    </div>
-  );
-};
+import type { Liff } from "@line/liff";
 
 const CollectionMode = () => {
   const [foodInputs, setFoodInputs] = useState<string[]>([""]); 
@@ -58,35 +32,37 @@ const CollectionMode = () => {
     }
   };
 
-  const [isLine, setIsLine] = useState<boolean | null>(null);
-  const initLiff = async () => {
-    if (!window.liff) {
-      setIsLine(false);
-      return null;
-    }
-  
-    setIsLine(true);
-  
-    const liff = window.liff;
-    await liff.init({ liffId: "2008446494" });
-  
-    if (!liff.isLoggedIn()) {
-      liff.login({
-        redirectUri: window.location.href,
-      });
-      return null;
-    }
-  
-    return liff.getIDToken();
-  };
+  const [liffObject, setLiffObject] = useState<Liff | null>(null);
+  const [token, setToken] = useState("");
+  const [liffError, setLiffError] = useState<string | null>(null);
 
   useEffect(() => {
-    initLiff().then((t) => {
-      if (t) setToken(t);
-    });
+    import("@line/liff")
+      .then((liff) => liff.default)
+      .then((liff) => {
+        liff
+          .init({ liffId: "2008687620-lM6YNhdu" })
+          .then(() => {
+            if (!liff.isLoggedIn()) {
+              liff.login({
+                redirectUri: window.location.href,
+              });
+              return;
+            }
+
+            setLiffObject(liff);
+
+            const idToken = liff.getIDToken();
+            if (idToken) {
+              setToken(idToken);
+            }
+          })
+          .catch((err: Error) => {
+            setLiffError(err.toString());
+          });
+      });
   }, []);
 
-  const [token, setToken] = useState("");
 
   const [meal, setMeal] = useState("");
   const [bloat, setBloat] = useState<"yes" | "no" | "">("");
@@ -194,14 +170,14 @@ const CollectionMode = () => {
     alert("บันทึกข้อมูลไม่สำเร็จ");
   }
 };
+  if (liffError) {
+  return <div>LIFF Error: {liffError}</div>;
+}
 
-  if (isLine === null) {
-  return null;
+  if (!liffObject) {
+    return <div>Loading...</div>;
   }
-  
-  if (isLine === false) {
-    return <OpenInLine />;
-  }
+
   return (
     
     <div className="min-h-screen bg-background">
