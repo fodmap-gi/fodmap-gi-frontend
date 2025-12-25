@@ -1,4 +1,3 @@
-import liff from "@line/liff";
 import { Link } from "react-router-dom";
 
 export default function Index() {
