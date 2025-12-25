@@ -129,7 +129,7 @@ const CollectionMode = () => {
 
   try {
     // SEND TO BACKEND
-    const response = await fetch("http://fodmaps.wtfywmtfk.com/collection", {
+    const response = await fetch("https://fodmaps.wtfywmtfk.com/collection", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
