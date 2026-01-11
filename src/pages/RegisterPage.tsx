@@ -5,7 +5,7 @@ import { User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-/* ------------------ TIME CONSTANTS ------------------ */
+/* TIME CONSTANTS */
 const HOURS_12 = ["01","02","03","04","05","06","07","08","09","10","11","12"];
 const MINUTES = ["00","15","30","45"];
 const MERIDIEM = ["AM","PM"];
@@ -35,6 +35,14 @@ export default function RegisterPage(){
     setTouchedSave(true);
     if(errors.name){ alert("กรุณากรอกข้อมูลให้ครบ"); return; }
 
+    const payload = {
+    name: name.trim(),
+    notification: {
+      breakfast: to24(breakfast.h, breakfast.m, breakfast.ap),
+      lunch: to24(lunch.h, lunch.m, lunch.ap),
+      dinner: to24(dinner.h, dinner.m, dinner.ap)
+    }
+  };
     localStorage.setItem("userProfile",JSON.stringify({
       name,
       notification:{
@@ -64,7 +72,8 @@ export default function RegisterPage(){
       <div>
         <h3 className={`font-semibold mb-2 ${touchedSave&&errors.name?"text-red-700":""}`}>ชื่อ-นามสกุล</h3>
         <Input value={name} onChange={e=>setName(e.target.value)}
-         className={`h-12 ${touchedSave&&errors.name?"border-red-400 bg-red-100":""}`} />
+        placeholder="ชื่อ และนามสกุลของคุณ"
+        className={`h-12 ${touchedSave&&errors.name?"border-red-400 bg-red-100":""}`} />
       </div>
 
       <Card>

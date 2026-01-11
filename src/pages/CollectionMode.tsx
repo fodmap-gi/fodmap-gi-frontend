@@ -39,43 +39,56 @@ const CollectionMode = () => {
   const [liffError, setLiffError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  const USE_LIFF_MOCK = true;     // LINE login mock
+  const USE_PROFILE_MOCK = true;  // userProfile mock
   useEffect(() => {
+  if (USE_PROFILE_MOCK) {
+    console.log("Profile mock enabled");
+    return;
+  }
+
   const userProfile = localStorage.getItem("userProfile");
-  
-  
+
   if (!userProfile) {
     alert("กรุณาตั้งค่าข้อมูลผู้ใช้ก่อน");
     navigate("/register");
   }
 }, [navigate]);
-/* edit
-  useEffect(() => {
-    import("@line/liff")
-      .then((liff) => liff.default)
-      .then((liff) => {
-        liff
-          .init({ liffId: "2008687620-lM6YNhdu" })
-          .then(() => {
-            if (!liff.isLoggedIn()) {
-              liff.login({
-                redirectUri: window.location.href,
-              });
-              return;
-            }
 
-            setLiffObject(liff);
+useEffect(() => {
+  if (USE_LIFF_MOCK) {
+    console.log("LIFF MOCK MODE");
 
-            const idToken = liff.getIDToken();
-            if (idToken) {
-              setToken(idToken);
-            }
-          })
-          .catch((err: Error) => {
-            setLiffError(err.toString());
-          });
-      });
-  }, []);
-*/
+    setLiffObject({
+      isLoggedIn: () => true,
+      getIDToken: () => "MOCK_ID_TOKEN",
+    } as any);
+
+    setToken("MOCK_TOKEN_123456");
+    return;
+  }
+
+  import("@line/liff")
+    .then((liff) => liff.default)
+    .then((liff) => {
+      liff
+        .init({ liffId: "2008687620-lM6YNhdu" })
+        .then(() => {
+          if (!liff.isLoggedIn()) {
+            liff.login({ redirectUri: window.location.href });
+            return;
+          }
+
+          setLiffObject(liff);
+
+          const idToken = liff.getIDToken();
+          if (idToken) setToken(idToken);
+        })
+        .catch((err: Error) => setLiffError(err.toString()));
+    });
+}, []);
+
+
             
   const [meal, setMeal] = useState("");
   const [bloat, setBloat] = useState<"yes" | "no" | "">("");
@@ -132,6 +145,7 @@ const CollectionMode = () => {
   // go to preview
   navigate("/collection/preview", {
     state: {
+      token,
       foodInputs,
       meal,
       bloat,
@@ -222,11 +236,10 @@ useEffect(() => {
   if (liffError) {
   return <div>LIFF Error: {liffError}</div>;
 }
-/* edit
   if (!liffObject) {
     return <div>Loading...</div>;
   }
-*/
+
   
   return (
     

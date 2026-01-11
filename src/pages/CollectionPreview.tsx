@@ -1,9 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Utensils, Calendar } from "lucide-react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate} from "react-router-dom";
+import { useState } from "react";
+
 
 interface PreviewState {
+  token: string;
   foodInputs: string[];
   meal: string;
   bloat: "yes" | "no" | "";
@@ -31,8 +34,47 @@ const CollectionPreview = () => {
     );
   }
 
-  const { foodInputs, meal, bloat, bloatLvl, pain, painLvl, time } = state;
+  const {token,foodInputs, meal, bloat, bloatLvl, pain, painLvl, time } = state;
+  const [loading, setLoading] = useState(false);
+  const USE_MOCK = true;   // always mock
+  const handleSubmit = async () => {
+  try {
+    setLoading(true);
 
+    // ========== MOCK MODE ==========
+    if (USE_MOCK) {
+      await new Promise(r => setTimeout(r, 1200)); // fake network delay
+      navigate("/collection/success");
+      return;
+    }
+
+    const payload = {
+      token,
+      menus: foodInputs,
+      meal,
+      bloat: bloat === "yes",
+      bloatLvl,
+      pain: pain === "yes",
+      painLvl,
+      time: new Date(time).getTime(),
+    };
+
+    const res = await fetch("https://fodmaps.wtfywmtfk.com/collection", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error();
+
+    navigate("/collection/success");
+  } catch {
+    alert("บันทึกข้อมูลไม่สำเร็จ กรุณาลองใหม่");
+  } finally {
+    setLoading(false);
+  }
+};
+  
   return (
     <div className="min-h-screen bg-background">
 
@@ -125,23 +167,13 @@ const CollectionPreview = () => {
                 </Button>
 
                 <Button
-                className="w-full h-12"
-                onClick={() =>
-                    navigate("/collection/success", {
-                    state: {
-                        foodInputs,
-                        meal,
-                        bloat,
-                        bloatLvl,
-                        pain,
-                        painLvl,
-                        time,
-                    },
-                    })
-                }
+                  className="w-full h-12"
+                  disabled={loading}
+                  onClick={handleSubmit}
                 >
-                ยืนยันบันทึกข้อมูล
+                  {loading ? "กำลังบันทึก..." : "ยืนยันบันทึกข้อมูล"}
                 </Button>
+
             </div>
 
           </CardContent>

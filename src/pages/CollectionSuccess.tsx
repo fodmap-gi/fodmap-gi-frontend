@@ -1,36 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useNavigate} from "react-router-dom";
 
 const CollectionSuccess = () => {
   const navigate = useNavigate();
-  const { state } = useLocation() as any;
-
-  useEffect(() => {
-    if (!state) {
-      navigate("/collection");
-      return;
-    }
-
-    const payload = {
-      token: localStorage.getItem("token"),
-      menus: state.foodInputs,
-      meal: state.meal,
-      bloat: state.bloat === "yes",
-      bloatLvl: state.bloatLvl,
-      pain: state.pain === "yes",
-      painLvl: state.painLvl,
-      time: new Date(state.time).getTime(),
-    };
-
-    fetch("https://fodmaps.wtfywmtfk.com/collection", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }).catch(() => alert("บันทึกข้อมูลไม่สำเร็จ"));
-  }, []);
 
   return (
     <div className="min-h-screen bg-background flex items-start justify-center px-4 pt-10">
@@ -50,7 +24,7 @@ const CollectionSuccess = () => {
         <Card className="shadow-lg border-0 animate-slide-up">
           <CardContent className="pt-6 space-y-4">
             <Button className="w-full h-12" onClick={() => navigate("/collection")}>
-              บันทึกการกินเพิ่ม
+              บันทึกการกินเพิ่มเติม
             </Button>
 
         
