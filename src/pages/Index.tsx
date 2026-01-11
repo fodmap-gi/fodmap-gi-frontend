@@ -21,6 +21,20 @@ export default function Index() {
       >
         Go to Collection Mode
       </Link>
+
+      <Link
+        to="/register"
+        className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-green-600"
+      >
+        Go to RegisterPage
+      </Link>
+
+      <Link
+        to="/profile"
+        className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-green-600"
+      >
+        Go to ProfilePage
+      </Link>
     </div>
   );
 }

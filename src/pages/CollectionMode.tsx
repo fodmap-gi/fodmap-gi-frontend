@@ -7,6 +7,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import type { Liff } from "@line/liff";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const CollectionMode = () => {
   const [foodInputs, setFoodInputs] = useState<string[]>([""]); 
@@ -35,7 +37,18 @@ const CollectionMode = () => {
   const [liffObject, setLiffObject] = useState<Liff | null>(null);
   const [token, setToken] = useState("");
   const [liffError, setLiffError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+  const userProfile = localStorage.getItem("userProfile");
+  
+  
+  if (!userProfile) {
+    alert("กรุณาตั้งค่าข้อมูลผู้ใช้ก่อน");
+    navigate("/register");
+  }
+}, [navigate]);
+/* edit
   useEffect(() => {
     import("@line/liff")
       .then((liff) => liff.default)
@@ -62,8 +75,8 @@ const CollectionMode = () => {
           });
       });
   }, []);
-
-
+*/
+            
   const [meal, setMeal] = useState("");
   const [bloat, setBloat] = useState<"yes" | "no" | "">("");
   const [bloatLvl, setBloatLvl] = useState(0);
@@ -94,7 +107,7 @@ const CollectionMode = () => {
   painLvl: false,   
 });
 
-  const saveData = async () => {
+  const goToPreview = () => {
   setTouchedSave(true);
 
   const hasEmptyMenu = foodInputs.some((f) => f.trim() === "");
@@ -110,10 +123,43 @@ const CollectionMode = () => {
 
   setErrors(newErrors);
 
+  // alert & stop
   if (Object.values(newErrors).some((v) => v)) {
-    alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+    alert("กรุณากรอกข้อมูลให้ครบก่อนตรวจสอบ");
     return;
   }
+
+  // go to preview
+  navigate("/collection/preview", {
+    state: {
+      foodInputs,
+      meal,
+      bloat,
+      bloatLvl,
+      pain,
+      painLvl,
+      time,
+    },
+  });
+};
+
+const location = useLocation();
+useEffect(() => {
+  const s = location.state as any;
+
+  if (s?.restore) {
+    setFoodInputs(s.foodInputs);
+    setMeal(s.meal);
+    setBloat(s.bloat);
+    setBloatLvl(s.bloatLvl);
+    setPain(s.pain);
+    setPainLvl(s.painLvl);
+    setTime(s.time);
+  }
+}, [location.state]);
+/*
+  const saveData = async () => {
+  setTouchedSave(true);
 
   // CREATE JSON PAYLOAD
   const payload = {
@@ -126,6 +172,7 @@ const CollectionMode = () => {
   painLvl: painLvl,
   time: new Date(time).getTime(),
 };
+
 
   try {
     // SEND TO BACKEND
@@ -146,7 +193,7 @@ const CollectionMode = () => {
 
     // SUCCESS POPUP
     alert("เก็บข้อมูลเรียบร้อยแล้ว");
-
+    
     // RESET FORM
     setFoodInputs([""]);
     setMeal("");
@@ -170,14 +217,17 @@ const CollectionMode = () => {
     alert("บันทึกข้อมูลไม่สำเร็จ");
   }
 };
+*/
+
   if (liffError) {
   return <div>LIFF Error: {liffError}</div>;
 }
-
+/* edit
   if (!liffObject) {
     return <div>Loading...</div>;
   }
-
+*/
+  
   return (
     
     <div className="min-h-screen bg-background">
@@ -493,14 +543,12 @@ const CollectionMode = () => {
               </div>
             </div>
 
-
-
             {/* Save */}
             <Button
               className="w-full h-12 text-base mt-2"
-              onClick={saveData}
+              onClick={goToPreview}
             >
-              บันทึกข้อมูล
+              ตรวจสอบข้อมูลก่อนบันทึก
             </Button>
           </CardContent>
         </Card>
