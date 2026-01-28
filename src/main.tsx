@@ -9,6 +9,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import CollectionPreview from "./pages/CollectionPreview";
 import CollectionSuccess from "./pages/CollectionSuccess";
+import EditProfilePage from "./pages/EditProfilePage";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -20,6 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/collection/preview" element={<CollectionPreview />} />
       <Route path="/collection/success" element={<CollectionSuccess />} />
+      <Route path="/profile/edit" element={<EditProfilePage />} />
     </Routes>
   </BrowserRouter>
 );

@@ -42,6 +42,7 @@ export default function RegisterPage(){
       lunch: to24(lunch.h, lunch.m, lunch.ap),
       dinner: to24(dinner.h, dinner.m, dinner.ap)
     }
+    
   };
     localStorage.setItem("userProfile",JSON.stringify({
       name,
@@ -51,6 +52,7 @@ export default function RegisterPage(){
         dinner:to24(dinner.h,dinner.m,dinner.ap)
       }
     }));
+    localStorage.setItem("userProfile", JSON.stringify(payload));
     navigate("/profile");
   };
 

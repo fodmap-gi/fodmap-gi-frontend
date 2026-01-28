@@ -72,13 +72,8 @@ const CheckingMode = () => {
     <div className="min-h-screen bg-background">
       {/* Color Test Section */}
       <div className="p-4 space-y-2 mb-6 border rounded-lg">
-        <div className="text-sm font-bold mb-2">Color Test:</div>
+        <div className="text-sm font-bold mb-2">Back:</div>
         <div className="flex flex-wrap gap-2">
-          <div className="bg-primary text-primary-foreground p-2 rounded">Primary</div>
-          <div className="bg-accent text-accent-foreground p-2 rounded">Accent</div>
-          <div className="bg-destructive text-destructive-foreground p-2 rounded">Destructive</div>
-          <div className="bg-secondary text-secondary-foreground p-2 rounded">Secondary</div>
-          <div className="bg-muted text-muted-foreground p-2 rounded">Muted</div>
           <Link to="/" className="px-6 py-3 bg-gray-500 text-white rounded-lg">
             Back to Main
           </Link>
