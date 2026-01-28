@@ -1,5 +1,7 @@
 # FODMAP–GI Frontend
 
+**Live Demo:** https://fodmap-gi-frontend.vercel.app/
+
 This repository contains the **frontend application** for the FODMAP–GI project.
 
 The application allows users to:
